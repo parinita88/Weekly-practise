@@ -1,42 +1,42 @@
-/* Question 1 - Classify results into buckets
-How can you produce a list of facilities, with each labelled as 'cheap' or 'expensive' depending on if their monthly maintenance cost is more than $100? Return the name and monthly maintenance of the facilities in question.
+/* Question 1 - Count the number of expensive facilities
 
-https://pgexercises.com/questions/basic/classify.html
+Produce a count of the number of facilities that have a cost to guests of 10 or more.
+
+https://pgexercises.com/questions/aggregates/count2.html
 */
 
 SELECT 
-    name,
-    (CASE
-        WHEN monthlymaintenance > 100 THEN 'expensive'
-        ELSE 'cheap'
-    END) AS cost
+    COUNT(*)
 FROM
-    cd.facilities;
+    cd.facilities
+WHERE
+    guestcost >= 10;
     
 /* Question 2 - working with dates
-How can you produce a list of members who joined after the start of September 2012? Return the memid, surname, firstname, and joindate of the members in question.
+Produce a count of the number of recommendations each member has made. Order by member ID.
 
-https://pgexercises.com/questions/basic/date.html
+https://pgexercises.com/questions/aggregates/count3.html
 */
 
 SELECT 
-    memid, surname, firstname, joindate
+    recommendedby, COUNT(*)
 FROM
     cd.members
 WHERE
-    DATE_DIFF('days', joindate, '2012-09-01') >= 0;
+    recommendedby IS NOT NULL
+GROUP BY 1
+ORDER BY 1;
 
-/* Question 3 - Retrieve the start times of members' bookings
-How can you produce a list of the start times for bookings by members named 'David Farrell'?
+/* Question 3 - List facilities with more than 1000 slots booked
+Produce a list of facilities with more than 1000 slots booked. Produce an output table consisting of facility id and slots, sorted by facility id.
 
-https://pgexercises.com/questions/joins/simplejoin.html
+https://pgexercises.com/questions/aggregates/fachours1a.html
 */
 
 SELECT 
-    starttime
+    facid, SUM(slots) AS "Total Slots"
 FROM
-    cd.members
-        JOIN
-    cd.bookings USING (memid)
-WHERE
-    CONCAT(firstname, ' ', surname) = 'David Farrell';
+    cd.bookings
+GROUP BY 1
+HAVING SUM(slots) > 1000
+ORDER BY 1;
